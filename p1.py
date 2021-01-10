@@ -35,22 +35,23 @@ class RecvThread(threading.Thread):
     def run(self):
         # reception des datagrames
         while(True):
-            # try:
-            bytesAddressPair = UDPRecvSocket.recvfrom(config.BUFFER_SIZE)
-            data = bytesAddressPair[0]
-            temp = json.loads(data)['temp']
-            senderId = json.loads(data)['id']
-            address = bytesAddressPair[1]
-            print('recu {} par {}'.format(temp, senderId))
-            # enregistrer le processus s'il n'existe pas
-            if (senderId, address) not in listeProcessus:
-                listeProcessus.append((senderId, address))
-                print('liste des processus :', listeProcessus)
-            global leader
-            if leader==None and len(listeProcessus)==config.NB_PROCESSUS:
-                leader = max(listeProcessus, key=lambda x: x[0])
-            # except:
-            #     print('erreur de reception')
+            try:
+                bytesAddressPair = UDPRecvSocket.recvfrom(config.BUFFER_SIZE)
+                data = bytesAddressPair[0]
+                temp = json.loads(data)['temp']
+                senderId = json.loads(data)['id']
+                address = bytesAddressPair[1]
+                print('recu {} par {}'.format(temp, senderId))
+                # enregistrer le processus s'il n'existe pas
+                if (senderId, address) not in listeProcessus:
+                    listeProcessus.append((senderId, address))
+                    print('liste des processus :', listeProcessus)
+                global leader
+                # selectionner un leader si on a tous les processus
+                if leader==None and len(listeProcessus)==config.NB_PROCESSUS:
+                    leader = max(listeProcessus, key=lambda x: x[0])
+            except:
+                print('erreur de reception')
 
 class SendThread(threading.Thread):
     def __init__(self):
@@ -60,7 +61,7 @@ class SendThread(threading.Thread):
         # envoi des datagrames
         addressPortEnvoyeur = (config.HOST, sendPort)
         i = 5
-        while(i>0):
+        while True:
             i -= 1
             time.sleep(5)
             temp = random.randint(0, 40)

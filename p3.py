@@ -6,7 +6,7 @@ import time
 import json
 
 # parametres locals
-numProcess = 2
+numProcess = 3
 id = random.randint(1, 100)
 pSuiv = (numProcess + 1) % config.NB_PROCESSUS
 pPrec = config.NB_PROCESSUS if numProcess==1 else (numProcess-1)
